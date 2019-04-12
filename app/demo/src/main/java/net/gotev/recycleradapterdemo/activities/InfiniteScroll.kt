@@ -49,7 +49,8 @@ class InfiniteScroll : AppCompatActivity() {
                 .setMaxSize(50)
                 .build(),
             emptyItem = LabelItem(getString(R.string.empty_list)),
-            showEmptyItemOnStartup = true
+            showEmptyItemOnStartup = true,
+            errorItem = LabelItem("Oh no 😿, it seems that something gone wrong!")
         )
 
         recycler_view.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)

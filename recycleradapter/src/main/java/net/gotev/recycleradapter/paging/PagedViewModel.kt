@@ -13,9 +13,11 @@ internal class PagedViewModel : ViewModel() {
 
     private lateinit var pagedDataSourceFactory: PagedDataSourceFactory<Any>
     private lateinit var emptyDataSourceFactory: PagedDataSourceFactory<Int>
+    private lateinit var errorDataSourceFactory: PagedDataSourceFactory<Int>
 
     private lateinit var fullData: LiveData<PagedList<AdapterItem<*>>>
     private lateinit var empty: LiveData<PagedList<AdapterItem<*>>>
+    private lateinit var error: LiveData<PagedList<AdapterItem<*>>>
 
     lateinit var data: LiveData<PagedList<AdapterItem<*>>>
 
@@ -23,22 +25,31 @@ internal class PagedViewModel : ViewModel() {
         recyclerDataSource: RecyclerDataSource<Any, AdapterItem<*>>,
         config: PagedList.Config,
         emptyItem: AdapterItem<*>? = null,
-        showEmptyItemOnStartup: Boolean = false
+        showEmptyItemOnStartup: Boolean = false,
+        errorItem: AdapterItem<*>? = null
     ) {
         swapDataSource(recyclerDataSource, config)
 
         if (showEmptyItemOnStartup) {
-            emptyItem?.let(::setEmptyItem) ?: throw IllegalStateException("EmptyItem null")
+            emptyItem?.let(::setEmptyItem)
+                ?: throw IllegalStateException("You must add an EmptyItem to show on startup")
             clear()
         } else {
-            emptyItem?.let(::setEmptyItem)
+            setEmptyItem(emptyItem)
             dismissEmptyItem()
         }
+
+        setErrorItem(errorItem)
     }
 
-    fun setEmptyItem(emptyItem: AdapterItem<*>) {
-        emptyDataSourceFactory = PagedDataSourceFactory(EmptyDataSource(emptyItem), loadingState)
+    fun setEmptyItem(emptyItem: AdapterItem<*>? = null) {
+        emptyDataSourceFactory = PagedDataSourceFactory(FallbackDataSource(emptyItem), loadingState)
         empty = emptyDataSourceFactory.toLiveData(1)
+    }
+
+    fun setErrorItem(errorItem: AdapterItem<*>? = null) {
+        errorDataSourceFactory = PagedDataSourceFactory(FallbackDataSource(errorItem), loadingState)
+        error = errorDataSourceFactory.toLiveData(1)
     }
 
     fun reload() {
@@ -48,6 +59,10 @@ internal class PagedViewModel : ViewModel() {
 
     fun clear() {
         data = empty
+    }
+
+    fun showError() {
+        data = error
     }
 
     private fun dismissEmptyItem() {

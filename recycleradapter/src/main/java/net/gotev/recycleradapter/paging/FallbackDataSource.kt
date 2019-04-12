@@ -3,14 +3,12 @@ package net.gotev.recycleradapter.paging
 import androidx.paging.PageKeyedDataSource
 import net.gotev.recycleradapter.AdapterItem
 
-class EmptyDataSource(
-    emptyItem: AdapterItem<*>? = null
-) : RecyclerDataSource<Int, AdapterItem<*>> {
+class FallbackDataSource(item: AdapterItem<*>? = null) : RecyclerDataSource<Int, AdapterItem<*>> {
 
     private val fallbackData = mutableListOf<AdapterItem<*>>()
 
     init {
-        emptyItem?.let(fallbackData::add)
+        item?.let(fallbackData::add)
     }
 
     override fun loadInitial(
@@ -29,10 +27,4 @@ class EmptyDataSource(
         params: PageKeyedDataSource.LoadParams<Int>,
         callback: PagingResultCallback<Int, AdapterItem<*>>
     ) { }
-
-    fun setEmptyState(emptyItem: AdapterItem<*>) {
-        if (!fallbackData.contains(emptyItem)) {
-            fallbackData.add(emptyItem)
-        }
-    }
 }

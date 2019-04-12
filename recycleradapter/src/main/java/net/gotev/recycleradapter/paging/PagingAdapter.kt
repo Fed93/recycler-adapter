@@ -18,13 +18,14 @@ class PagingAdapter(
     recyclerDataSource: RecyclerDataSource<Any, AdapterItem<*>>,
     config: PagedList.Config,
     emptyItem: AdapterItem<*>? = null,
-    showEmptyItemOnStartup: Boolean = false
+    showEmptyItemOnStartup: Boolean = false,
+    errorItem: AdapterItem<*>? = null
 ) : PagedListAdapter<AdapterItem<*>, RecyclerAdapterViewHolder>(diffCallback) {
 
     private val viewModel: PagedViewModel = ViewModelProviders.of(activity).get(PagedViewModel::class.java)
 
     init {
-        viewModel.init(recyclerDataSource, config, emptyItem, showEmptyItemOnStartup)
+        viewModel.init(recyclerDataSource, config, emptyItem, showEmptyItemOnStartup, errorItem)
         viewModel.data.observe(activity, Observer(::submitList))
 
         if (showEmptyItemOnStartup) {
@@ -54,13 +55,23 @@ class PagingAdapter(
         currentList: PagedList<AdapterItem<*>>?
     ) {
         super.onCurrentListChanged(previousList, currentList)
-        if (currentList.isNullOrEmpty()) clear()
+        if (currentList.isNullOrEmpty()) {
+            if (getState().value == LoadingState.ERROR) {
+                showError()
+            } else {
+                clear()
+            }
+        }
     }
 
     override fun getItemViewType(position: Int) = getItem(position).viewType()
 
     fun setEmptyItem(item: AdapterItem<*>) {
         viewModel.setEmptyItem(item)
+    }
+
+    fun setErrorItem(item: AdapterItem<*>) {
+        viewModel.setErrorItem(item)
     }
 
     fun reload() {
@@ -72,6 +83,11 @@ class PagingAdapter(
 
     fun clear() {
         viewModel.clear()
+        viewModel.data.observe(activity, Observer(::submitList))
+    }
+
+    fun showError() {
+        viewModel.showError()
         viewModel.data.observe(activity, Observer(::submitList))
     }
 
