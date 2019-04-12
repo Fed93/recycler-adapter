@@ -14,27 +14,44 @@ internal class PagedViewModel : ViewModel() {
     private lateinit var pagedDataSourceFactory: PagedDataSourceFactory<Any>
     private lateinit var emptyDataSourceFactory: PagedDataSourceFactory<Int>
 
+    private lateinit var fullData: LiveData<PagedList<AdapterItem<*>>>
+    private lateinit var empty: LiveData<PagedList<AdapterItem<*>>>
+
     lateinit var data: LiveData<PagedList<AdapterItem<*>>>
 
     fun init(
         recyclerDataSource: RecyclerDataSource<Any, AdapterItem<*>>,
         config: PagedList.Config,
-        emptyItem: AdapterItem<*>? = null
+        emptyItem: AdapterItem<*>? = null,
+        showEmptyItemOnStartup: Boolean = false
     ) {
-        emptyItem?.let(::setEmptyItem)
         swapDataSource(recyclerDataSource, config)
+
+        if (showEmptyItemOnStartup) {
+            emptyItem?.let(::setEmptyItem) ?: throw IllegalStateException("EmptyItem null")
+            clear()
+        } else {
+            emptyItem?.let(::setEmptyItem)
+            dismissEmptyItem()
+        }
     }
 
     fun setEmptyItem(emptyItem: AdapterItem<*>) {
         emptyDataSourceFactory = PagedDataSourceFactory(EmptyDataSource(emptyItem), loadingState)
+        empty = emptyDataSourceFactory.toLiveData(1)
     }
 
     fun reload() {
+        dismissEmptyItem()
         pagedDataSourceFactory.pagedDataSourceLiveData.value?.invalidate()
     }
 
     fun clear() {
-        data = emptyDataSourceFactory.toLiveData(1)
+        data = empty
+    }
+
+    private fun dismissEmptyItem() {
+        data = fullData
     }
 
     fun swapDataSource(
@@ -54,7 +71,7 @@ internal class PagedViewModel : ViewModel() {
         pageSize: Int?
     ) {
         pagedDataSourceFactory = PagedDataSourceFactory(newDataSource, loadingState)
-        data = when {
+        fullData = when {
             config != null -> pagedDataSourceFactory.toLiveData(config)
             pageSize != null -> pagedDataSourceFactory.toLiveData(pageSize)
             else -> throw IllegalStateException("Configuration and PageSize null")

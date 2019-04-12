@@ -1,5 +1,6 @@
 package net.gotev.recycleradapter.paging
 
+import android.os.Handler
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
@@ -16,14 +17,19 @@ class PagingAdapter(
     private val activity: FragmentActivity,
     recyclerDataSource: RecyclerDataSource<Any, AdapterItem<*>>,
     config: PagedList.Config,
-    emptyItem: AdapterItem<*>? = null
+    emptyItem: AdapterItem<*>? = null,
+    showEmptyItemOnStartup: Boolean = false
 ) : PagedListAdapter<AdapterItem<*>, RecyclerAdapterViewHolder>(diffCallback) {
 
     private val viewModel: PagedViewModel = ViewModelProviders.of(activity).get(PagedViewModel::class.java)
 
     init {
-        viewModel.init(recyclerDataSource, config, emptyItem)
+        viewModel.init(recyclerDataSource, config, emptyItem, showEmptyItemOnStartup)
         viewModel.data.observe(activity, Observer(::submitList))
+
+        if (showEmptyItemOnStartup) {
+            Handler().post { reload() }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerAdapterViewHolder {
@@ -43,6 +49,14 @@ class PagingAdapter(
         bindItem(holder, position, payloads.isEmpty())
     }
 
+    override fun onCurrentListChanged(
+        previousList: PagedList<AdapterItem<*>>?,
+        currentList: PagedList<AdapterItem<*>>?
+    ) {
+        super.onCurrentListChanged(previousList, currentList)
+        if (currentList.isNullOrEmpty()) clear()
+    }
+
     override fun getItemViewType(position: Int) = getItem(position).viewType()
 
     fun setEmptyItem(item: AdapterItem<*>) {
@@ -51,6 +65,7 @@ class PagingAdapter(
 
     fun reload() {
         viewModel.reload()
+        viewModel.data.observe(activity, Observer(::submitList))
     }
 
     fun getState() = viewModel.loadingState
