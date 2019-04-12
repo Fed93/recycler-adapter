@@ -29,4 +29,10 @@ class EmptyDataSource(
         params: PageKeyedDataSource.LoadParams<Int>,
         callback: PagingResultCallback<Int, AdapterItem<*>>
     ) { }
+
+    fun setEmptyState(emptyItem: AdapterItem<*>) {
+        if (!fallbackData.contains(emptyItem)) {
+            fallbackData.add(emptyItem)
+        }
+    }
 }

@@ -11,7 +11,7 @@ internal class PagedViewModel : ViewModel() {
 
     private lateinit var pagedDataSourceFactory: PagedDataSourceFactory<Any>
 
-    private lateinit var emptyDataSource: RecyclerDataSource<Any, AdapterItem<*>>
+    private val emptyDataSource = EmptyDataSource()
 
     lateinit var data: LiveData<PagedList<AdapterItem<*>>>
     internal val loadingState: MutableLiveData<LoadingState> = MutableLiveData()
@@ -21,13 +21,13 @@ internal class PagedViewModel : ViewModel() {
         config: PagedList.Config,
         emptyItem: AdapterItem<*>? = null
     ) {
-        emptyItem?.let(::createEmptyDataSource)
+        emptyItem?.let(emptyDataSource::setEmptyState)
         pagedDataSourceFactory = PagedDataSourceFactory(recyclerDataSource, loadingState)
         data = pagedDataSourceFactory.toLiveData(config)
     }
 
     fun setEmptyItem(emptyItem: AdapterItem<*>) {
-        createEmptyDataSource(emptyItem)
+        emptyDataSource.setEmptyState(emptyItem)
     }
 
     fun reload() {
@@ -35,7 +35,7 @@ internal class PagedViewModel : ViewModel() {
     }
 
     fun clear() {
-        swapDataSource(emptyDataSource, 1)
+        swapDataSource(emptyDataSource as RecyclerDataSource<Any, AdapterItem<*>>, 1)
     }
 
     fun swapDataSource(
@@ -60,9 +60,5 @@ internal class PagedViewModel : ViewModel() {
             pageSize != null -> pagedDataSourceFactory.toLiveData(pageSize)
             else -> throw IllegalStateException("Configuration and PageSize null")
         }
-    }
-
-    private fun createEmptyDataSource(emptyItem: AdapterItem<*>) {
-        emptyDataSource = EmptyDataSource(emptyItem) as RecyclerDataSource<Any, AdapterItem<*>>
     }
 }
