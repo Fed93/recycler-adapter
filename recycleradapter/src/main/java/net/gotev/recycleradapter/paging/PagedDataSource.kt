@@ -26,6 +26,7 @@ internal class PagedDataSource<T>(
 
     override fun loadBefore(params: LoadParams<T>, callback: LoadCallback<T, AdapterItem<*>>) {
         val internalCallback = PagingResultCallback(callback = callback, state = loadingState)
+        loadingState.postValue(LoadingState.LOADING)
         recyclerDataSource.loadBefore(params, internalCallback)
     }
 }
