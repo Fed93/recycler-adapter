@@ -14,7 +14,7 @@ import net.gotev.recycleradapter.paging.PagingAdapter
 import net.gotev.recycleradapter.paging.RecyclerDataSource
 import net.gotev.recycleradapterdemo.R
 import net.gotev.recycleradapterdemo.adapteritems.LabelItem
-import net.gotev.recycleradapterdemo.datasource.MainActivityDataSource
+import net.gotev.recycleradapterdemo.datasource.InfiniteScrollingDataSource
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
         pagingAdapter = PagingAdapter(
             activity = this,
-            recyclerDataSource = MainActivityDataSource() as RecyclerDataSource<Any, AdapterItem<*>>,
+            recyclerDataSource = InfiniteScrollingDataSource() as RecyclerDataSource<Any, AdapterItem<*>>,
             config = PagedList.Config.Builder()
                 .setPageSize(20)
                 .setEnablePlaceholders(true)
@@ -110,8 +110,13 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        R.id.api_integration -> {
+        R.id.infinite_scrolling -> {
             InfiniteScroll.show(this)
+            true
+        }
+
+        R.id.api_integration -> {
+            LoadFromNetwork.show(this)
             true
         }
 

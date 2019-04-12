@@ -9,7 +9,7 @@ import net.gotev.recycleradapterdemo.adapteritems.TitleSubtitleItem
 import net.gotev.recycleradapterdemo.adapteritems.leavebehind.MyLeaveBehindItem
 import java.util.Random
 
-class MainActivityDataSource : RecyclerDataSource<Int, AdapterItem<*>> {
+class InfiniteScrollingDataSource : RecyclerDataSource<Int, AdapterItem<*>> {
 
     private val random by lazy {
         Random(System.currentTimeMillis())

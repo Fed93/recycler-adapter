@@ -31,6 +31,12 @@
         app:showAsAction="never|withText"
         android:visible="true"
         android:enabled="true"
+        android:id="@+id/infinite_scrolling" />
+
+    <item android:title="@string/network_call"
+        app:showAsAction="never|withText"
+        android:visible="true"
+        android:enabled="true"
         android:id="@+id/api_integration" />
 
     <item android:title="@string/carousels_plain"
