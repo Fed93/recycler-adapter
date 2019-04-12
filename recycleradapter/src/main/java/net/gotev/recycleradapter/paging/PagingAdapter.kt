@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView.NO_ID
 import net.gotev.recycleradapter.AdapterItem
 import net.gotev.recycleradapter.RecyclerAdapterViewHolder
 import net.gotev.recycleradapter.castAsIn
@@ -31,6 +32,8 @@ class PagingAdapter(
         if (showEmptyItemOnStartup) {
             Handler().post { reload() }
         }
+
+        setHasStableIds(true)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerAdapterViewHolder {
@@ -65,6 +68,9 @@ class PagingAdapter(
     }
 
     override fun getItemViewType(position: Int) = getItem(position).viewType()
+
+    override fun getItemId(position: Int) =
+        getItem(position)?.diffingId()?.hashCode()?.toLong() ?: NO_ID
 
     fun setEmptyItem(item: AdapterItem<*>) {
         viewModel.setEmptyItem(item)
