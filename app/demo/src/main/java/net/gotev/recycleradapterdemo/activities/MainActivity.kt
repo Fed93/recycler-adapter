@@ -5,17 +5,18 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
+import net.gotev.recycleradapter.AdapterItem
 import net.gotev.recycleradapter.RecyclerAdapter
+import net.gotev.recycleradapter.paging.PagingAdapter
+import net.gotev.recycleradapter.paging.RecyclerDataSource
 import net.gotev.recycleradapterdemo.R
 import net.gotev.recycleradapterdemo.adapteritems.LabelItem
-import net.gotev.recycleradapterdemo.adapteritems.TextWithToggleItem
-import net.gotev.recycleradapterdemo.adapteritems.TitleSubtitleItem
-import net.gotev.recycleradapterdemo.adapteritems.leavebehind.MyLeaveBehindItem
-import java.util.*
-
+import net.gotev.recycleradapterdemo.datasource.MainActivityDataSource
+import java.util.Random
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,62 +26,76 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var recyclerAdapter: RecyclerAdapter
 
+    private lateinit var pagingAdapter: PagingAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        recyclerAdapter = RecyclerAdapter()
-        recyclerAdapter.setEmptyItem(LabelItem(getString(R.string.empty_list)))
+//        recyclerAdapter = RecyclerAdapter()
+//        recyclerAdapter.setEmptyItem(LabelItem(getString(R.string.empty_list)))
+
+        pagingAdapter = PagingAdapter(
+            activity = this,
+            recyclerDataSource = MainActivityDataSource() as RecyclerDataSource<Any, AdapterItem<*>>,
+            config = PagedList.Config.Builder()
+                .setPageSize(20)
+                .setEnablePlaceholders(true)
+                .setPrefetchDistance(10)
+                .build()
+        ).apply {
+            setEmptyItem(LabelItem(getString(R.string.empty_list)))
+        }
 
         recycler_view.apply {
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-            adapter = recyclerAdapter
-            recyclerAdapter.enableDragDrop(this)
+            adapter = pagingAdapter
+            //recyclerAdapter.enableDragDrop(this)
         }
 
         // add an item
-        recyclerAdapter.add(MyLeaveBehindItem("swipe to left to leave behind", "option"))
-
-        // add many items of two kinds
-        val items = (0..random.nextInt(200) + 50).map {
-            if (it % 2 == 0)
-                TitleSubtitleItem("Item $it")
-            else
-                TextWithToggleItem("Toggle $it")
-        }
-
-        recyclerAdapter.add(items)
+//        recyclerAdapter.add(MyLeaveBehindItem("swipe to left to leave behind", "option"))
+//
+//        // add many items of two kinds
+//        val items = (0..random.nextInt(200) + 50).map {
+//            if (it % 2 == 0)
+//                TitleSubtitleItem("Item $it")
+//            else
+//                TextWithToggleItem("Toggle $it")
+//        }
+//
+//        recyclerAdapter.add(items)
 
         configureActions()
     }
 
     private fun configureActions() {
         remove_all_items_of_a_kind.setOnClickListener {
-            recyclerAdapter.removeAllItemsWithClass(TitleSubtitleItem::class.java)
+            //recyclerAdapter.removeAllItemsWithClass(TitleSubtitleItem::class.java)
         }
 
         remove_last_item_of_a_kind.setOnClickListener {
-            recyclerAdapter.removeLastItemWithClass(TextWithToggleItem::class.java)
+            //recyclerAdapter.removeLastItemWithClass(TextWithToggleItem::class.java)
         }
 
         remove_last_item_of_a_kind.setOnClickListener {
-            recyclerAdapter.removeLastItemWithClass(TextWithToggleItem::class.java)
+            //recyclerAdapter.removeLastItemWithClass(TextWithToggleItem::class.java)
         }
 
         remove_all.setOnClickListener {
-            recyclerAdapter.clear()
+            //pagingAdapter.clear()
         }
 
         add_item.setOnClickListener {
-            recyclerAdapter.add(
-                    TitleSubtitleItem("Item ${UUID.randomUUID()}"),
-                    position = 1
-            )
+//            recyclerAdapter.add(
+//                    TitleSubtitleItem("Item ${UUID.randomUUID()}"),
+//                    position = 1
+//            )
         }
     }
 
     private fun onSearch(query: String?) {
-        recyclerAdapter.filter(query)
+        //recyclerAdapter.filter(query)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -4,7 +4,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_leave_behind.*
+import kotlinx.android.synthetic.main.item_leave_behind.swipe_background_layout
+import kotlinx.android.synthetic.main.item_leave_behind.swipe_content_view
 import net.gotev.recycleradapter.RecyclerAdapterViewHolder
 
 /**
@@ -12,8 +13,9 @@ import net.gotev.recycleradapter.RecyclerAdapterViewHolder
  * @author Aleksandar Gotev
  */
 
-abstract class LeaveBehindViewHolder(itemView: View)
-    : RecyclerAdapterViewHolder(itemView), LayoutContainer {
+abstract class LeaveBehindViewHolder(
+    itemView: View
+) : RecyclerAdapterViewHolder(itemView), LayoutContainer {
 
     override val containerView: View?
         get() = itemView

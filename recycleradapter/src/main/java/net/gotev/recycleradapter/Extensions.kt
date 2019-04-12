@@ -5,3 +5,8 @@ package net.gotev.recycleradapter
  */
 internal fun AdapterItem<*>?.viewType() = this?.javaClass?.name?.hashCode() ?: 0
 internal fun Class<out AdapterItem<*>>.viewType() = hashCode()
+
+@Suppress("UNCHECKED_CAST")
+internal fun <T : RecyclerAdapterViewHolder> AdapterItem<out T>.castAsIn(): AdapterItem<in T> {
+    return this as AdapterItem<in T>
+}

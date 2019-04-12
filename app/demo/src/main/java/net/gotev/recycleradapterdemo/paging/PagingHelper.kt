@@ -49,8 +49,7 @@ private class PagedRecyclerAdapter
     }
 }
 
-class PagingHelper<Key>(dataSource: () -> DataSource<Key, AdapterItem<*>>,
-                        config: PagedList.Config) {
+class PagingHelper<Key>(dataSource: () -> DataSource<Key, AdapterItem<*>>, config: PagedList.Config) {
     private val dataSourceFactory = object : DataSource.Factory<Key, AdapterItem<*>>() {
         override fun create(): DataSource<Key, AdapterItem<*>> {
             return dataSource()
