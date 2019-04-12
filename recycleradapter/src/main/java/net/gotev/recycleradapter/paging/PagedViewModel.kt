@@ -9,32 +9,32 @@ import net.gotev.recycleradapter.AdapterItem
 
 internal class PagedViewModel : ViewModel() {
 
-    private lateinit var pagedDataSourceFactory: PagedDataSourceFactory<Any>
+    internal val loadingState: MutableLiveData<LoadingState> = MutableLiveData()
 
-    private val emptyDataSource = EmptyDataSource()
+    private lateinit var pagedDataSourceFactory: PagedDataSourceFactory<Any>
+    private lateinit var emptyDataSourceFactory: PagedDataSourceFactory<Int>
 
     lateinit var data: LiveData<PagedList<AdapterItem<*>>>
-    internal val loadingState: MutableLiveData<LoadingState> = MutableLiveData()
 
     fun init(
         recyclerDataSource: RecyclerDataSource<Any, AdapterItem<*>>,
         config: PagedList.Config,
         emptyItem: AdapterItem<*>? = null
     ) {
-        emptyItem?.let(emptyDataSource::setEmptyState)
+        emptyItem?.let(::setEmptyItem)
         swapDataSource(recyclerDataSource, config)
     }
 
     fun setEmptyItem(emptyItem: AdapterItem<*>) {
-        emptyDataSource.setEmptyState(emptyItem)
+        emptyDataSourceFactory = PagedDataSourceFactory(EmptyDataSource(emptyItem), loadingState)
     }
 
     fun reload() {
-        pagedDataSourceFactory.reload()
+        pagedDataSourceFactory.pagedDataSourceLiveData.value?.invalidate()
     }
 
     fun clear() {
-        swapDataSource(emptyDataSource as RecyclerDataSource<Any, AdapterItem<*>>, 1)
+        data = emptyDataSourceFactory.toLiveData(1)
     }
 
     fun swapDataSource(

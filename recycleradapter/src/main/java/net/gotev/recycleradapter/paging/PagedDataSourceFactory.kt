@@ -9,15 +9,11 @@ internal class PagedDataSourceFactory<T>(
     private val loadingState: MutableLiveData<LoadingState>
 ) : DataSource.Factory<T, AdapterItem<*>>() {
 
-    private val pagedDataSourceLiveData = MutableLiveData<PagedDataSource<T>>()
+    internal val pagedDataSourceLiveData = MutableLiveData<PagedDataSource<T>>()
 
     override fun create(): DataSource<T, AdapterItem<*>> {
         val dataSource = PagedDataSource(recyclerDataSource, loadingState)
         pagedDataSourceLiveData.postValue(dataSource)
         return dataSource
-    }
-
-    fun reload() {
-        pagedDataSourceLiveData.value?.invalidate()
     }
 }
