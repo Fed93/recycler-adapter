@@ -22,8 +22,7 @@ internal class PagedViewModel : ViewModel() {
         emptyItem: AdapterItem<*>? = null
     ) {
         emptyItem?.let(emptyDataSource::setEmptyState)
-        pagedDataSourceFactory = PagedDataSourceFactory(recyclerDataSource, loadingState)
-        data = pagedDataSourceFactory.toLiveData(config)
+        swapDataSource(recyclerDataSource, config)
     }
 
     fun setEmptyItem(emptyItem: AdapterItem<*>) {
