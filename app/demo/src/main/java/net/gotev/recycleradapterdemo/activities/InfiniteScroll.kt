@@ -15,6 +15,7 @@ import net.gotev.recycleradapter.paging.PagingAdapter
 import net.gotev.recycleradapter.paging.RecyclerDataSource
 import net.gotev.recycleradapterdemo.App
 import net.gotev.recycleradapterdemo.R
+import net.gotev.recycleradapterdemo.adapteritems.LabelItem
 import net.gotev.recycleradapterdemo.network.api.StarWarsPeopleDataSource
 
 class InfiniteScroll : AppCompatActivity() {
@@ -42,11 +43,12 @@ class InfiniteScroll : AppCompatActivity() {
             activity = this,
             recyclerDataSource = StarWarsPeopleDataSource(App.starWarsClient) as RecyclerDataSource<Any, AdapterItem<*>>,
             config = PagedList.Config.Builder()
-                .setPageSize(20)
-                .setEnablePlaceholders(true)
+                .setPageSize(10)
+                .setInitialLoadSizeHint(20)
                 .setPrefetchDistance(10)
                 .setMaxSize(50)
-                .build()
+                .build(),
+            emptyItem = LabelItem(getString(R.string.empty_list))
         )
 
         recycler_view.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)

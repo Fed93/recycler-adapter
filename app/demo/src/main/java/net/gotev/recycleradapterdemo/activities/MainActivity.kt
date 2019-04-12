@@ -10,21 +10,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
 import net.gotev.recycleradapter.AdapterItem
-import net.gotev.recycleradapter.RecyclerAdapter
 import net.gotev.recycleradapter.paging.PagingAdapter
 import net.gotev.recycleradapter.paging.RecyclerDataSource
 import net.gotev.recycleradapterdemo.R
 import net.gotev.recycleradapterdemo.adapteritems.LabelItem
 import net.gotev.recycleradapterdemo.datasource.MainActivityDataSource
-import java.util.Random
 
 class MainActivity : AppCompatActivity() {
-
-    private val random by lazy {
-        Random(System.currentTimeMillis())
-    }
-
-    private lateinit var recyclerAdapter: RecyclerAdapter
 
     private lateinit var pagingAdapter: PagingAdapter
 
@@ -32,39 +24,22 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        recyclerAdapter = RecyclerAdapter()
-//        recyclerAdapter.setEmptyItem(LabelItem(getString(R.string.empty_list)))
-
         pagingAdapter = PagingAdapter(
             activity = this,
             recyclerDataSource = MainActivityDataSource() as RecyclerDataSource<Any, AdapterItem<*>>,
             config = PagedList.Config.Builder()
                 .setPageSize(20)
                 .setEnablePlaceholders(true)
-                .setPrefetchDistance(10)
                 .build()
-        ).apply {
-            setEmptyItem(LabelItem(getString(R.string.empty_list)))
-        }
+        )
+
+        pagingAdapter.setEmptyItem(LabelItem(getString(R.string.empty_list)))
 
         recycler_view.apply {
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             adapter = pagingAdapter
             //recyclerAdapter.enableDragDrop(this)
         }
-
-        // add an item
-//        recyclerAdapter.add(MyLeaveBehindItem("swipe to left to leave behind", "option"))
-//
-//        // add many items of two kinds
-//        val items = (0..random.nextInt(200) + 50).map {
-//            if (it % 2 == 0)
-//                TitleSubtitleItem("Item $it")
-//            else
-//                TextWithToggleItem("Toggle $it")
-//        }
-//
-//        recyclerAdapter.add(items)
 
         configureActions()
     }
@@ -83,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         remove_all.setOnClickListener {
-            //pagingAdapter.clear()
+            pagingAdapter.clear()
         }
 
         add_item.setOnClickListener {

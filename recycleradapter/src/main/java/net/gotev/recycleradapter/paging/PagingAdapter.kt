@@ -13,28 +13,21 @@ import net.gotev.recycleradapter.castAsIn
 import net.gotev.recycleradapter.viewType
 
 class PagingAdapter(
-    activity: FragmentActivity,
+    private val activity: FragmentActivity,
     recyclerDataSource: RecyclerDataSource<Any, AdapterItem<*>>,
-    config: PagedList.Config
+    config: PagedList.Config,
+    emptyItem: AdapterItem<*>? = null
 ) : PagedListAdapter<AdapterItem<*>, RecyclerAdapterViewHolder>(diffCallback) {
 
     private val viewModel: PagedViewModel = ViewModelProviders.of(activity).get(PagedViewModel::class.java)
-    private var emptyItem: AdapterItem<in RecyclerAdapterViewHolder>? = null
 
     init {
-        viewModel.init(recyclerDataSource, config)
-        viewModel.data.observe(activity, Observer { list ->
-            submitList(list)
-        })
+        viewModel.init(recyclerDataSource, config, emptyItem)
+        viewModel.data.observe(activity, Observer(::submitList))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerAdapterViewHolder {
-        val item = if (canShowEmptyItem() && viewType == emptyItem.viewType()) {
-            emptyItem!!
-        } else {
-            currentList?.find { it.viewType() == viewType }
-        }
-
+        val item = currentList?.find { it.viewType() == viewType }
         return item?.createItemViewHolder(parent) ?: throw IllegalStateException("Item not found")
     }
 
@@ -50,15 +43,10 @@ class PagingAdapter(
         bindItem(holder, position, payloads.isEmpty())
     }
 
-    override fun getItemViewType(position: Int): Int {
-        if (canShowEmptyItem()) {
-            return emptyItem.viewType()
-        }
-        return getItem(position).viewType()
-    }
+    override fun getItemViewType(position: Int) = getItem(position).viewType()
 
-    fun setEmptyItem(item: AdapterItem<*>?) {
-        emptyItem = item?.castAsIn()
+    fun setEmptyItem(item: AdapterItem<*>) {
+        viewModel.setEmptyItem(item)
     }
 
     fun reload() {
@@ -68,22 +56,26 @@ class PagingAdapter(
     fun getState() = viewModel.loadingState
 
     fun clear() {
-        if (currentList?.isEmpty() == false) {
-            submitList(null)
-            notifyItemInserted(0)
-        }
+        viewModel.clear()
+        viewModel.data.observe(activity, Observer(::submitList))
     }
 
-    private fun canShowEmptyItem(): Boolean = false
+    fun swapDataSource(
+        newDataSource: RecyclerDataSource<Any, AdapterItem<*>>,
+        config: PagedList.Config
+    ) {
+        viewModel.swapDataSource(newDataSource, config)
+        viewModel.data.observe(activity, Observer(::submitList))
+    }
+
+    fun swapDataSource(newDataSource: RecyclerDataSource<Any, AdapterItem<*>>, pageSize: Int) {
+        viewModel.swapDataSource(newDataSource, pageSize)
+        viewModel.data.observe(activity, Observer(::submitList))
+    }
 
     private fun bindItem(holder: RecyclerAdapterViewHolder, position: Int, firstTime: Boolean) {
-        val item = if (canShowEmptyItem()) {
-            emptyItem!!
-        } else {
-            getItem(position)?.castAsIn()
-        }
-
-        item?.bind(firstTime, holder) ?: throw IllegalStateException("Item not found")
+        getItem(position)?.castAsIn()?.bind(firstTime, holder)
+            ?: throw IllegalStateException("Item not found")
     }
 
     companion object {
