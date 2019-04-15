@@ -24,13 +24,13 @@ internal class PagedViewModel : ViewModel() {
     val data = MutableLiveData<LiveData<PagedList<AdapterItem<*>>>>()
 
     fun init(
-        recyclerDataSource: RecyclerDataSource<Any, AdapterItem<*>>?,
+        recyclerDataSource: RecyclerDataSource<*, *>?,
         config: PagedList.Config,
         emptyItem: AdapterItem<*>? = null,
         showEmptyItemOnStartup: Boolean = false,
         errorItem: AdapterItem<*>? = null
     ) {
-        swapDataSource((recyclerDataSource ?: FallbackDataSource().casted()), config)
+        swapDataSource((recyclerDataSource ?: FallbackDataSource()), config)
 
         if (showEmptyItemOnStartup) {
             emptyItem?.let(::setEmptyItem)
@@ -71,23 +71,20 @@ internal class PagedViewModel : ViewModel() {
         data.swapWith(fullData)
     }
 
-    fun swapDataSource(
-        newDataSource: RecyclerDataSource<Any, AdapterItem<*>>,
-        config: PagedList.Config
-    ) {
+    fun swapDataSource(newDataSource: RecyclerDataSource<*, *>, config: PagedList.Config) {
         swapDataSource(newDataSource, config, null)
     }
 
-    fun swapDataSource(newDataSource: RecyclerDataSource<Any, AdapterItem<*>>, pageSize: Int) {
+    fun swapDataSource(newDataSource: RecyclerDataSource<*, *>, pageSize: Int) {
         swapDataSource(newDataSource, null, pageSize)
     }
 
     private fun swapDataSource(
-        newDataSource: RecyclerDataSource<Any, AdapterItem<*>>,
+        newDataSource: RecyclerDataSource<*, *>,
         config: PagedList.Config?,
         pageSize: Int?
     ) {
-        pagedDataSourceFactory = PagedDataSourceFactory(newDataSource, loadingState)
+        pagedDataSourceFactory = PagedDataSourceFactory(newDataSource.casted(), loadingState)
         fullData = when {
             config != null -> pagedDataSourceFactory.toLiveData(config)
             pageSize != null -> pagedDataSourceFactory.toLiveData(pageSize)

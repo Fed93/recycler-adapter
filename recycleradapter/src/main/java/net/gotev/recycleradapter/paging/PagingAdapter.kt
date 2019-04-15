@@ -23,13 +23,7 @@ class PagingAdapter(
     private val viewModel: PagedViewModel = ViewModelProviders.of(activity).get(PagedViewModel::class.java)
 
     init {
-        viewModel.init(
-            recyclerDataSource?.casted(),
-            config,
-            emptyItem,
-            showEmptyItemOnStartup,
-            errorItem
-        )
+        viewModel.init(recyclerDataSource, config, emptyItem, showEmptyItemOnStartup, errorItem)
         viewModel.data.observe(activity, Observer {
             it.observe(activity, Observer(::submitList))
         })
@@ -78,11 +72,11 @@ class PagingAdapter(
         getItem(position)?.diffingId()?.hashCode()?.toLong() ?: NO_ID
 
     fun setDataSource(newDataSource: RecyclerDataSource<*, *>, config: PagedList.Config) {
-        viewModel.swapDataSource(newDataSource.casted(), config)
+        viewModel.swapDataSource(newDataSource, config)
     }
 
     fun setDataSource(newDataSource: RecyclerDataSource<*, *>, pageSize: Int) {
-        viewModel.swapDataSource(newDataSource.casted(), pageSize)
+        viewModel.swapDataSource(newDataSource, pageSize)
     }
 
     fun setEmptyItem(item: AdapterItem<*>) {
