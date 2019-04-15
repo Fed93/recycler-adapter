@@ -14,7 +14,7 @@ internal class PagedDataSource<T>(
         callback: LoadInitialCallback<T, AdapterItem<*>>
     ) {
         val internalCallback = PagingResultCallback(initialCallback = callback, state = loadingState)
-        loadingState.postValue(LoadingState.INITIAL_LOADING)
+        loadingState.postValue(LoadingState.LOADING)
         recyclerDataSource.loadInitial(params, internalCallback)
     }
 

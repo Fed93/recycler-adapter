@@ -57,7 +57,7 @@ class LoadFromNetwork : AppCompatActivity() {
         recycler_view.adapter = pagingAdapter
 
         pagingAdapter.getState().observe(this, Observer {
-            swipeRefresh.isRefreshing = (it == LoadingState.LOADING || it == LoadingState.INITIAL_LOADING)
+            swipeRefresh.isRefreshing = (it == LoadingState.LOADING)
         })
 
         swipeRefresh.setOnRefreshListener {
