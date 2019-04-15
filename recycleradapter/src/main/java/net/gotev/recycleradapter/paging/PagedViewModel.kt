@@ -8,6 +8,8 @@ import androidx.paging.toLiveData
 import net.gotev.recycleradapter.AdapterItem
 import net.gotev.recycleradapter.casted
 
+internal typealias LivePagedItemsList = LiveData<PagedList<AdapterItem<*>>>
+
 internal class PagedViewModel : ViewModel() {
 
     internal val loadingState: MutableLiveData<LoadingState> = MutableLiveData()
@@ -16,11 +18,11 @@ internal class PagedViewModel : ViewModel() {
     private lateinit var emptyDataSourceFactory: PagedDataSourceFactory<Int>
     private lateinit var errorDataSourceFactory: PagedDataSourceFactory<Int>
 
-    private lateinit var fullData: LiveData<PagedList<AdapterItem<*>>>
-    private lateinit var empty: LiveData<PagedList<AdapterItem<*>>>
-    private lateinit var error: LiveData<PagedList<AdapterItem<*>>>
+    private lateinit var fullData: LivePagedItemsList
+    private lateinit var empty: LivePagedItemsList
+    private lateinit var error: LivePagedItemsList
 
-    val data = MutableLiveData<LiveData<PagedList<AdapterItem<*>>>>()
+    val data = MutableLiveData<LivePagedItemsList>()
 
     fun init(
         recyclerDataSource: RecyclerDataSource<*, *>?,
