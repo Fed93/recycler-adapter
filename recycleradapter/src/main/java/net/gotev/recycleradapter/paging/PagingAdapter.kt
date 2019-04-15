@@ -14,7 +14,7 @@ import net.gotev.recycleradapter.*
 class PagingAdapter(
     private val activity: FragmentActivity,
     recyclerDataSource: RecyclerDataSource<*, *>? = null,
-    config: PagedList.Config,
+    config: PagedList.Config = PagedList.Config.Builder().build(),
     emptyItem: AdapterItem<*>? = null,
     showEmptyItemOnStartup: Boolean = false,
     errorItem: AdapterItem<*>? = null
@@ -77,6 +77,14 @@ class PagingAdapter(
     override fun getItemId(position: Int) =
         getItem(position)?.diffingId()?.hashCode()?.toLong() ?: NO_ID
 
+    fun setDataSource(newDataSource: RecyclerDataSource<*, *>, config: PagedList.Config) {
+        viewModel.swapDataSource(newDataSource.casted(), config)
+    }
+
+    fun setDataSource(newDataSource: RecyclerDataSource<*, *>, pageSize: Int) {
+        viewModel.swapDataSource(newDataSource.casted(), pageSize)
+    }
+
     fun setEmptyItem(item: AdapterItem<*>) {
         viewModel.setEmptyItem(item)
     }
@@ -97,14 +105,6 @@ class PagingAdapter(
 
     fun showError() {
         viewModel.showError()
-    }
-
-    fun swapDataSource(newDataSource: RecyclerDataSource<*, *>, config: PagedList.Config) {
-        viewModel.swapDataSource(newDataSource.casted(), config)
-    }
-
-    fun swapDataSource(newDataSource: RecyclerDataSource<*, *>, pageSize: Int) {
-        viewModel.swapDataSource(newDataSource.casted(), pageSize)
     }
 
     private fun bindItem(holder: RecyclerAdapterViewHolder, position: Int, firstTime: Boolean) {

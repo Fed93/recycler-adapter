@@ -70,15 +70,15 @@ class SyncActivity : AppCompatActivity() {
         }
 
         syncA.setOnClickListener {
-            recyclerAdapter.swapDataSource(SyncDataSourceA(), config)
+            recyclerAdapter.setDataSource(SyncDataSourceA(), config)
         }
 
         syncB.setOnClickListener {
-            recyclerAdapter.swapDataSource(SyncDataSourceB(), config)
+            recyclerAdapter.setDataSource(SyncDataSourceB(), config)
         }
 
         syncC.setOnClickListener {
-            recyclerAdapter.swapDataSource(SyncDataSourceC(), config)
+            recyclerAdapter.setDataSource(SyncDataSourceC(), config)
         }
 
         empty.setOnClickListener {
@@ -90,7 +90,7 @@ class SyncActivity : AppCompatActivity() {
                 shuffle.text = getString(R.string.button_shuffle_stop)
                 executor.scheduleAtFixedRate({
                     runOnUiThread {
-                        recyclerAdapter.swapDataSource(SyncDataSourceShuffle(), config)
+                        recyclerAdapter.setDataSource(SyncDataSourceShuffle(), config)
                     }
                 }, 1, 100, TimeUnit.MILLISECONDS)
             } else {
