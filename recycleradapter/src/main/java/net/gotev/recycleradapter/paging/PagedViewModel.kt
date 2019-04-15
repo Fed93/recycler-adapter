@@ -7,7 +7,6 @@ import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import net.gotev.recycleradapter.AdapterItem
 import net.gotev.recycleradapter.casted
-import net.gotev.recycleradapter.swapWith
 
 internal class PagedViewModel : ViewModel() {
 
@@ -60,15 +59,15 @@ internal class PagedViewModel : ViewModel() {
     }
 
     fun clear() {
-        data.swapWith(empty)
+        data.postValue(empty)
     }
 
     fun showError() {
-        data.swapWith(error)
+        data.postValue(error)
     }
 
     private fun fillWithData() {
-        data.swapWith(fullData)
+        data.postValue(fullData)
     }
 
     fun swapDataSource(newDataSource: RecyclerDataSource<*, *>, config: PagedList.Config) {

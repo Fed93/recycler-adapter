@@ -1,6 +1,5 @@
 package net.gotev.recycleradapter
 
-import androidx.lifecycle.MutableLiveData
 import net.gotev.recycleradapter.paging.RecyclerDataSource
 
 /**
@@ -16,7 +15,3 @@ internal fun <T : RecyclerAdapterViewHolder> AdapterItem<out T>.castAsIn(): Adap
 
 @Suppress("UNCHECKED_CAST")
 internal fun RecyclerDataSource<*, *>.casted() = this as RecyclerDataSource<Any, AdapterItem<*>>
-
-internal fun <T, E> MutableLiveData<T>.swapWith(`in`: E) {
-    postValue(`in` as T)
-}
