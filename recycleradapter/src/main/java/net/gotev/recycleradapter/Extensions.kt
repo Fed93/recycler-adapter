@@ -1,5 +1,7 @@
 package net.gotev.recycleradapter
 
+import net.gotev.recycleradapter.paging.RecyclerDataSource
+
 /**
  * @author Aleksandar Gotev
  */
@@ -10,3 +12,6 @@ internal fun Class<out AdapterItem<*>>.viewType() = hashCode()
 internal fun <T : RecyclerAdapterViewHolder> AdapterItem<out T>.castAsIn(): AdapterItem<in T> {
     return this as AdapterItem<in T>
 }
+
+@Suppress("UNCHECKED_CAST")
+internal fun RecyclerDataSource<*, *>.casted() = this as RecyclerDataSource<Any, AdapterItem<*>>

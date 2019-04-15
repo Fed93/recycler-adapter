@@ -7,9 +7,7 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_recycler_view.recycler_view
-import net.gotev.recycleradapter.AdapterItem
 import net.gotev.recycleradapter.paging.PagingAdapter
-import net.gotev.recycleradapter.paging.RecyclerDataSource
 import net.gotev.recycleradapterdemo.R
 import net.gotev.recycleradapterdemo.datasource.InfiniteScrollingDataSource
 
@@ -36,7 +34,7 @@ class InfiniteScroll : AppCompatActivity() {
 
         pagingAdapter = PagingAdapter(
             activity = this,
-            recyclerDataSource = InfiniteScrollingDataSource() as RecyclerDataSource<Any, AdapterItem<*>>,
+            recyclerDataSource = InfiniteScrollingDataSource(),
             config = PagedList.Config.Builder()
                 .setPageSize(20)
                 .build()

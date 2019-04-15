@@ -9,14 +9,11 @@ import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.NO_ID
-import net.gotev.recycleradapter.AdapterItem
-import net.gotev.recycleradapter.RecyclerAdapterViewHolder
-import net.gotev.recycleradapter.castAsIn
-import net.gotev.recycleradapter.viewType
+import net.gotev.recycleradapter.*
 
 class PagingAdapter(
     private val activity: FragmentActivity,
-    recyclerDataSource: RecyclerDataSource<Any, AdapterItem<*>>,
+    recyclerDataSource: RecyclerDataSource<*, *>,
     config: PagedList.Config,
     emptyItem: AdapterItem<*>? = null,
     showEmptyItemOnStartup: Boolean = false,
@@ -26,7 +23,13 @@ class PagingAdapter(
     private val viewModel: PagedViewModel = ViewModelProviders.of(activity).get(PagedViewModel::class.java)
 
     init {
-        viewModel.init(recyclerDataSource, config, emptyItem, showEmptyItemOnStartup, errorItem)
+        viewModel.init(
+            recyclerDataSource.casted(),
+            config,
+            emptyItem,
+            showEmptyItemOnStartup,
+            errorItem
+        )
         viewModel.data.observe(activity, Observer(::submitList))
 
         if (showEmptyItemOnStartup) {
