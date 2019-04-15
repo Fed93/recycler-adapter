@@ -35,10 +35,10 @@ class PagingAdapter(
         setHasStableIds(true)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerAdapterViewHolder {
-        val item = currentList?.find { it.viewType() == viewType }
-        return item?.createItemViewHolder(parent) ?: throw IllegalStateException("Item not found")
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = currentList
+        ?.find { it.viewType() == viewType }
+        ?.createItemViewHolder(parent)
+        ?: throw IllegalStateException("Item not found")
 
     override fun onBindViewHolder(holder: RecyclerAdapterViewHolder, position: Int) {
         bindItem(holder, position, true)
@@ -57,6 +57,7 @@ class PagingAdapter(
         currentList: PagedList<AdapterItem<*>>?
     ) {
         super.onCurrentListChanged(previousList, currentList)
+
         if (currentList.isNullOrEmpty()) {
             if (getState().value == LoadingState.ERROR) {
                 showError()
@@ -107,7 +108,7 @@ class PagingAdapter(
     }
 
     companion object {
-        val diffCallback = object : DiffUtil.ItemCallback<AdapterItem<*>>() {
+        internal val diffCallback = object : DiffUtil.ItemCallback<AdapterItem<*>>() {
             override fun areItemsTheSame(oldItem: AdapterItem<*>, newItem: AdapterItem<*>) =
                 oldItem == newItem
 
