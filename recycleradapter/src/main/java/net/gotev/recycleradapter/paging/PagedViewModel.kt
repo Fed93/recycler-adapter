@@ -32,17 +32,14 @@ internal class PagedViewModel : ViewModel() {
         errorItem: AdapterItem<*>? = null
     ) {
         swapDataSource((recyclerDataSource ?: FallbackDataSource()), config)
+        setEmptyItem(emptyItem)
+        setErrorItem(errorItem)
 
         if (showEmptyItemOnStartup) {
-            emptyItem?.let(::setEmptyItem)
-                ?: throw IllegalStateException("You must add an EmptyItem to show on startup")
             clear()
         } else {
-            setEmptyItem(emptyItem)
             fillWithData()
         }
-
-        setErrorItem(errorItem)
     }
 
     fun setEmptyItem(emptyItem: AdapterItem<*>? = null) {
