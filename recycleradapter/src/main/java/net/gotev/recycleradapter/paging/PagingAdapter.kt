@@ -13,7 +13,7 @@ import net.gotev.recycleradapter.*
 
 class PagingAdapter(
     private val activity: FragmentActivity,
-    recyclerDataSource: RecyclerDataSource<*, *>,
+    recyclerDataSource: RecyclerDataSource<*, *>? = null,
     config: PagedList.Config,
     emptyItem: AdapterItem<*>? = null,
     showEmptyItemOnStartup: Boolean = false,
@@ -24,13 +24,15 @@ class PagingAdapter(
 
     init {
         viewModel.init(
-            recyclerDataSource.casted(),
+            recyclerDataSource?.casted(),
             config,
             emptyItem,
             showEmptyItemOnStartup,
             errorItem
         )
-        viewModel.data.observe(activity, Observer(::submitList))
+        viewModel.data.observe(activity, Observer {
+            it.observe(activity, Observer(::submitList))
+        })
 
         if (showEmptyItemOnStartup) {
             Handler().post { reload() }
@@ -85,32 +87,24 @@ class PagingAdapter(
 
     fun reload() {
         viewModel.reload()
-        viewModel.data.observe(activity, Observer(::submitList))
     }
 
     fun getState() = viewModel.loadingState
 
     fun clear() {
         viewModel.clear()
-        viewModel.data.observe(activity, Observer(::submitList))
     }
 
     fun showError() {
         viewModel.showError()
-        viewModel.data.observe(activity, Observer(::submitList))
     }
 
-    fun swapDataSource(
-        newDataSource: RecyclerDataSource<Any, AdapterItem<*>>,
-        config: PagedList.Config
-    ) {
-        viewModel.swapDataSource(newDataSource, config)
-        viewModel.data.observe(activity, Observer(::submitList))
+    fun swapDataSource(newDataSource: RecyclerDataSource<*, *>, config: PagedList.Config) {
+        viewModel.swapDataSource(newDataSource.casted(), config)
     }
 
-    fun swapDataSource(newDataSource: RecyclerDataSource<Any, AdapterItem<*>>, pageSize: Int) {
-        viewModel.swapDataSource(newDataSource, pageSize)
-        viewModel.data.observe(activity, Observer(::submitList))
+    fun swapDataSource(newDataSource: RecyclerDataSource<*, *>, pageSize: Int) {
+        viewModel.swapDataSource(newDataSource.casted(), pageSize)
     }
 
     private fun bindItem(holder: RecyclerAdapterViewHolder, position: Int, firstTime: Boolean) {

@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import net.gotev.recycleradapter.AdapterItem
+import net.gotev.recycleradapter.casted
+import net.gotev.recycleradapter.swapWith
 
 internal class PagedViewModel : ViewModel() {
 
@@ -19,16 +21,16 @@ internal class PagedViewModel : ViewModel() {
     private lateinit var empty: LiveData<PagedList<AdapterItem<*>>>
     private lateinit var error: LiveData<PagedList<AdapterItem<*>>>
 
-    lateinit var data: LiveData<PagedList<AdapterItem<*>>>
+    val data = MutableLiveData<LiveData<PagedList<AdapterItem<*>>>>()
 
     fun init(
-        recyclerDataSource: RecyclerDataSource<Any, AdapterItem<*>>,
+        recyclerDataSource: RecyclerDataSource<Any, AdapterItem<*>>?,
         config: PagedList.Config,
         emptyItem: AdapterItem<*>? = null,
         showEmptyItemOnStartup: Boolean = false,
         errorItem: AdapterItem<*>? = null
     ) {
-        swapDataSource(recyclerDataSource, config)
+        swapDataSource((recyclerDataSource ?: FallbackDataSource().casted()), config)
 
         if (showEmptyItemOnStartup) {
             emptyItem?.let(::setEmptyItem)
@@ -36,7 +38,7 @@ internal class PagedViewModel : ViewModel() {
             clear()
         } else {
             setEmptyItem(emptyItem)
-            dismissEmptyItem()
+            fillWithData()
         }
 
         setErrorItem(errorItem)
@@ -53,20 +55,20 @@ internal class PagedViewModel : ViewModel() {
     }
 
     fun reload() {
-        dismissEmptyItem()
+        fillWithData()
         pagedDataSourceFactory.pagedDataSourceLiveData.value?.invalidate()
     }
 
     fun clear() {
-        data = empty
+        data.swapWith(empty)
     }
 
     fun showError() {
-        data = error
+        data.swapWith(error)
     }
 
-    private fun dismissEmptyItem() {
-        data = fullData
+    private fun fillWithData() {
+        data.swapWith(fullData)
     }
 
     fun swapDataSource(
@@ -91,5 +93,6 @@ internal class PagedViewModel : ViewModel() {
             pageSize != null -> pagedDataSourceFactory.toLiveData(pageSize)
             else -> throw IllegalStateException("Configuration and PageSize null")
         }
+        fillWithData()
     }
 }

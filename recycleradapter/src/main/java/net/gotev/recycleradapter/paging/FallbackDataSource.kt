@@ -3,7 +3,7 @@ package net.gotev.recycleradapter.paging
 import androidx.paging.PageKeyedDataSource
 import net.gotev.recycleradapter.AdapterItem
 
-class FallbackDataSource(item: AdapterItem<*>? = null) : RecyclerDataSource<Int, AdapterItem<*>> {
+internal class FallbackDataSource(item: AdapterItem<*>? = null) : RecyclerDataSource<Int, AdapterItem<*>> {
 
     private val fallbackData = mutableListOf<AdapterItem<*>>()
 

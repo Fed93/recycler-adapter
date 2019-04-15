@@ -41,7 +41,7 @@ class LoadFromNetwork : AppCompatActivity() {
 
         pagingAdapter = PagingAdapter(
             activity = this,
-            recyclerDataSource = StarWarsPeopleDataSource(App.starWarsClient) as RecyclerDataSource<Any, AdapterItem<*>>,
+            recyclerDataSource = StarWarsPeopleDataSource(App.starWarsClient),
             config = PagedList.Config.Builder()
                 .setPageSize(10)
                 .setInitialLoadSizeHint(20)
