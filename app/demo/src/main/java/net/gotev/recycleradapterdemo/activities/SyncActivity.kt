@@ -5,18 +5,20 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_sync.*
-import net.gotev.recycleradapter.AdapterItem
-import net.gotev.recycleradapter.RecyclerAdapter
+import net.gotev.recycleradapter.paging.PagingAdapter
 import net.gotev.recycleradapterdemo.R
 import net.gotev.recycleradapterdemo.adapteritems.LabelItem
-import net.gotev.recycleradapterdemo.adapteritems.SyncItem
+import net.gotev.recycleradapterdemo.datasource.SyncDataSourceA
+import net.gotev.recycleradapterdemo.datasource.SyncDataSourceB
+import net.gotev.recycleradapterdemo.datasource.SyncDataSourceC
+import net.gotev.recycleradapterdemo.datasource.SyncDataSourceShuffle
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 
 
 class SyncActivity : AppCompatActivity() {
@@ -27,33 +29,14 @@ class SyncActivity : AppCompatActivity() {
         }
     }
 
-    private lateinit var recyclerAdapter: RecyclerAdapter
+    private lateinit var recyclerAdapter: PagingAdapter
     private var executor = ScheduledThreadPoolExecutor(1)
     private var scheduledOperation: ScheduledFuture<*>? = null
 
-    private var listB = arrayListOf(
-            SyncItem(1, "listA"),
-            SyncItem(3, "listB"),
-            SyncItem(4, "listB"),
-            SyncItem(5, "listB")
-    )
-
-    private fun listB(): ArrayList<SyncItem> {
-        listB.add(SyncItem(listB.last().id + 1, "listB${listB.last().id + 1}"))
-        listB.add(SyncItem(listB.last().id + 1, "listB${listB.last().id + 1}"))
-        return listB
-    }
-
-    private fun listA() =
-            arrayListOf(
-                    SyncItem(1, "listA"),
-                    SyncItem(2, "listA")
-            )
-
-    private fun listC() =
-            arrayListOf(
-                    SyncItem(1, "listC")
-            )
+    private val config = PagedList.Config.Builder()
+        .setPageSize(20)
+        .setEnablePlaceholders(true)
+        .build()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,30 +51,34 @@ class SyncActivity : AppCompatActivity() {
 
         val linearLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
-        recyclerAdapter = RecyclerAdapter().apply {
-            setEmptyItem(LabelItem(getString(R.string.empty_list)))
-            lockScrollingWhileInserting(linearLayoutManager)
-        }
+        recyclerAdapter = PagingAdapter(
+            activity = this,
+            config = config,
+            emptyItem = LabelItem(getString(R.string.empty_list)),
+            showEmptyItemOnStartup = true
+        )
+
+//        recyclerAdapter = RecyclerAdapter().apply {
+//            setEmptyItem(LabelItem(getString(R.string.empty_list)))
+//            lockScrollingWhileInserting(linearLayoutManager)
+//        }
 
         recycler_view.apply {
-            // fix blinking of first item when shuffling
-            itemAnimator?.changeDuration = 0
-
             // normal setup
             layoutManager = linearLayoutManager
             adapter = recyclerAdapter
         }
 
         syncA.setOnClickListener {
-            recyclerAdapter.syncWithItems(listA())
+            recyclerAdapter.swapDataSource(SyncDataSourceA(), config)
         }
 
         syncB.setOnClickListener {
-            recyclerAdapter.syncWithItems(listB())
+            recyclerAdapter.swapDataSource(SyncDataSourceB(), config)
         }
 
         syncC.setOnClickListener {
-            recyclerAdapter.syncWithItems(listC())
+            recyclerAdapter.swapDataSource(SyncDataSourceC(), config)
         }
 
         empty.setOnClickListener {
@@ -103,7 +90,7 @@ class SyncActivity : AppCompatActivity() {
                 shuffle.text = getString(R.string.button_shuffle_stop)
                 executor.scheduleAtFixedRate({
                     runOnUiThread {
-                        recyclerAdapter.syncWithItems(ArrayList(createItems()))
+                        recyclerAdapter.swapDataSource(SyncDataSourceShuffle(), config)
                     }
                 }, 1, 100, TimeUnit.MILLISECONDS)
             } else {
@@ -120,12 +107,6 @@ class SyncActivity : AppCompatActivity() {
         scheduledOperation = null
     }
 
-    fun createItems(): List<AdapterItem<*>> {
-        return (0..Random.nextInt(2, 20)).flatMap {
-            listOf(LabelItem("TITLE $it"), SyncItem(it, "ListC"))
-        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.sort_menu, menu)
         return true
@@ -133,12 +114,12 @@ class SyncActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.sort_ascending -> {
-            recyclerAdapter.sort(ascending = true)
+            //recyclerAdapter.sort(ascending = true)
             true
         }
 
         R.id.sort_descending -> {
-            recyclerAdapter.sort(false)
+            //recyclerAdapter.sort(false)
             true
         }
 
